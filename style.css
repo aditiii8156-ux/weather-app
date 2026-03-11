@@ -112,4 +112,10 @@ display:block;
 background:#222;
 color:white;
 }
+#theme-toggle{
+margin-bottom:10px;
+padding:6px 10px;
+cursor:pointer;
+}
+
 
