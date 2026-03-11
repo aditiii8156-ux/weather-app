@@ -13,13 +13,16 @@ const errorMessage = document.getElementById("error-message");
 const weatherIcon = document.getElementById("weather-icon");
 const toggleBtn = document.getElementById("theme-toggle");
 
+
 // Dark mode toggle
 toggleBtn.addEventListener("click", () => {
   document.body.classList.toggle("dark-mode");
 });
 
-// Search button click
+
+// Search button
 searchBtn.addEventListener("click", getWeather);
+
 
 // Enter key search
 cityInput.addEventListener("keydown", (e) => {
@@ -27,6 +30,7 @@ cityInput.addEventListener("keydown", (e) => {
     getWeather();
   }
 });
+
 
 async function getWeather() {
   const city = cityInput.value.trim();
@@ -37,26 +41,26 @@ async function getWeather() {
   }
 
   try {
+
     const response = await fetch(
-`${API_URL}?q=${city}&appid=${API_KEY}&units=metric`
+      `${API_URL}?q=${city}&appid=${API_KEY}&units=metric`
     );
-    
 
-    const data = await response.json();
-
-    if (data.cod !== 200) {
-      throw new Error(data.message);
+    if (!response.ok) {
+      throw new Error("City not found");
     }
 
+    const data = await response.json();
     displayWeather(data);
     hideError();
 
   } catch (error) {
-    showError("City not found");
+    showError(error.message);
   }
 }
 
-// Display weather data
+
+// Display weather
 function displayWeather(data) {
 
   tempValue.textContent = Math.round(data.main.temp);
@@ -65,42 +69,47 @@ function displayWeather(data) {
   wind.textContent = `${data.wind.speed} km/h`;
   locationText.textContent = `${data.name}, ${data.sys.country}`;
 
-  // High quality icon
   const iconCode = data.weather[0].icon;
   weatherIcon.src = `https://openweathermap.org/img/wn/${iconCode}@4x.png`;
 
   weatherInfo.classList.add("active");
 }
 
-// Error display
+
+// Show error
 function showError(message) {
   errorMessage.textContent = message;
   errorMessage.classList.add("active");
   weatherInfo.classList.remove("active");
 }
 
+
 function hideError() {
   errorMessage.classList.remove("active");
 }
 
-// Auto location weather
-navigator.geolocation.getCurrentPosition(async position => {
+
+// Auto-location weather
+navigator.geolocation.getCurrentPosition(async (position) => {
 
   const lat = position.coords.latitude;
   const lon = position.coords.longitude;
 
   try {
+
     const response = await fetch(
       `${API_URL}?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric`
     );
+
+    if (!response.ok) {
+      throw new Error("Location weather not available");
+    }
 
     const data = await response.json();
     displayWeather(data);
 
   } catch (error) {
-    console.log("Location weather not available");
+    console.log(error.message);
   }
 
 });
-
-
