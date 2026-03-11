@@ -26,10 +26,11 @@ This application allows users to search for any city and view current weather co
 - **OpenWeatherMap API** – Real-time weather data  
 
 ## Live Demo
-https://aditii8156-ux.github.io/weather-app
+ https://aditiii8156-ux.github.io/weather-app/
 ---
 
 ## 📂 Project Structure
+
 
 
 
