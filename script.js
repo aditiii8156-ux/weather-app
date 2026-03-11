@@ -38,8 +38,9 @@ async function getWeather() {
 
   try {
     const response = await fetch(
-      `${API_URL}?q=${city}&appid=${API_KEY}&units=metric`
+`${API_URL}?q=${city}&appid=${API_KEY}&units=metric`
     );
+    
 
     const data = await response.json();
 
@@ -101,3 +102,4 @@ navigator.geolocation.getCurrentPosition(async position => {
   }
 
 });
+
