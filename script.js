@@ -1,4 +1,4 @@
-const API_KEY = "d7fd3a821a40a3bb8866ce5b341a510f";
+const API_KEY = "YOUR_API_KEY";
 const API_URL = "https://api.openweathermap.org/data/2.5/weather";
 
 const cityInput = document.getElementById("city-input");
@@ -11,12 +11,18 @@ const wind = document.getElementById("wind");
 const locationText = document.getElementById("location");
 const errorMessage = document.getElementById("error-message");
 const weatherIcon = document.getElementById("weather-icon");
+const toggleBtn = document.getElementById("theme-toggle");
 
-// Button click event
+// Dark mode toggle
+toggleBtn.addEventListener("click", () => {
+  document.body.classList.toggle("dark-mode");
+});
+
+// Search button click
 searchBtn.addEventListener("click", getWeather);
 
-// Enter key event
-cityInput.addEventListener("keydown", function (e) {
+// Enter key search
+cityInput.addEventListener("keydown", (e) => {
   if (e.key === "Enter") {
     getWeather();
   }
@@ -25,7 +31,7 @@ cityInput.addEventListener("keydown", function (e) {
 async function getWeather() {
   const city = cityInput.value.trim();
 
-  if (city === "") {
+  if (!city) {
     showError("Please enter a city name");
     return;
   }
@@ -49,20 +55,23 @@ async function getWeather() {
   }
 }
 
+// Display weather data
 function displayWeather(data) {
 
   tempValue.textContent = Math.round(data.main.temp);
   weatherDesc.textContent = data.weather[0].description;
-  humidity.textContent = data.main.humidity + "%";
-  wind.textContent = data.wind.speed + " km/h";
-  locationText.textContent = data.name + ", " + data.sys.country;
+  humidity.textContent = `${data.main.humidity}%`;
+  wind.textContent = `${data.wind.speed} km/h`;
+  locationText.textContent = `${data.name}, ${data.sys.country}`;
 
+  // High quality icon
   const iconCode = data.weather[0].icon;
-  weatherIcon.src = `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
+  weatherIcon.src = `https://openweathermap.org/img/wn/${iconCode}@4x.png`;
 
   weatherInfo.classList.add("active");
 }
 
+// Error display
 function showError(message) {
   errorMessage.textContent = message;
   errorMessage.classList.add("active");
@@ -72,3 +81,23 @@ function showError(message) {
 function hideError() {
   errorMessage.classList.remove("active");
 }
+
+// Auto location weather
+navigator.geolocation.getCurrentPosition(async position => {
+
+  const lat = position.coords.latitude;
+  const lon = position.coords.longitude;
+
+  try {
+    const response = await fetch(
+      `${API_URL}?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric`
+    );
+
+    const data = await response.json();
+    displayWeather(data);
+
+  } catch (error) {
+    console.log("Location weather not available");
+  }
+
+});
