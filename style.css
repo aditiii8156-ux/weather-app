@@ -108,3 +108,8 @@ width:80px;
 margin:10px auto;
 display:block;
 }
+.dark-mode{
+background:#222;
+color:white;
+}
+
