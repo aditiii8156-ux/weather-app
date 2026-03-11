@@ -34,7 +34,7 @@ cityInput.addEventListener("keydown", (e) => {
 });
 
 
-// FETCH WEATHER BY CITY
+// FETCH WEATHER
 async function getWeather() {
 
   const city = cityInput.value.trim();
@@ -52,8 +52,9 @@ async function getWeather() {
 
     const data = await response.json();
 
-    if (!response.ok || data.cod != 200) {
-      throw new Error(data.message || "City not found");
+    if (data.cod != 200) {
+      showError(data.message || "City not found");
+      return;
     }
 
     displayWeather(data);
@@ -61,7 +62,7 @@ async function getWeather() {
 
   } catch (error) {
 
-    showError(error.message);
+    showError("Unable to fetch weather");
 
   }
 
@@ -77,10 +78,10 @@ function displayWeather(data) {
   wind.textContent = `${data.wind.speed} km/h`;
   locationText.textContent = `${data.name}, ${data.sys.country}`;
 
-  const iconCode = data.weather[0].icon;
-
-  weatherIcon.src =
-    `https://openweathermap.org/img/wn/${iconCode}@4x.png`;
+  if (weatherIcon) {
+    const iconCode = data.weather[0].icon;
+    weatherIcon.src = `https://openweathermap.org/img/wn/${iconCode}@4x.png`;
+  }
 
   weatherInfo.classList.add("active");
 
@@ -109,6 +110,7 @@ function hideError() {
 if (navigator.geolocation) {
 
   navigator.geolocation.getCurrentPosition(
+
     async (position) => {
 
       const lat = position.coords.latitude;
@@ -122,22 +124,22 @@ if (navigator.geolocation) {
 
         const data = await response.json();
 
-        if (response.ok) {
+        if (data.cod == 200) {
           displayWeather(data);
         }
 
-      } catch (error) {
+      } catch {
 
         console.log("Location weather not available");
 
       }
 
     },
+
     () => {
-
       console.log("Location permission denied");
-
     }
+
   );
 
 }
