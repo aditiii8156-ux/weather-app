@@ -14,17 +14,19 @@ const weatherIcon = document.getElementById("weather-icon");
 const toggleBtn = document.getElementById("theme-toggle");
 
 
-// Dark mode toggle
-toggleBtn.addEventListener("click", () => {
-  document.body.classList.toggle("dark-mode");
-});
+// DARK MODE
+if (toggleBtn) {
+  toggleBtn.addEventListener("click", () => {
+    document.body.classList.toggle("dark-mode");
+  });
+}
 
 
-// Search button
+// SEARCH BUTTON
 searchBtn.addEventListener("click", getWeather);
 
 
-// Enter key search
+// ENTER KEY SEARCH
 cityInput.addEventListener("keydown", (e) => {
   if (e.key === "Enter") {
     getWeather();
@@ -32,7 +34,9 @@ cityInput.addEventListener("keydown", (e) => {
 });
 
 
+// FETCH WEATHER BY CITY
 async function getWeather() {
+
   const city = cityInput.value.trim();
 
   if (!city) {
@@ -46,21 +50,25 @@ async function getWeather() {
       `${API_URL}?q=${city}&appid=${API_KEY}&units=metric`
     );
 
-    if (!response.ok) {
-      throw new Error("City not found");
+    const data = await response.json();
+
+    if (!response.ok || data.cod != 200) {
+      throw new Error(data.message || "City not found");
     }
 
-    const data = await response.json();
     displayWeather(data);
     hideError();
 
   } catch (error) {
+
     showError(error.message);
+
   }
+
 }
 
 
-// Display weather
+// DISPLAY WEATHER
 function displayWeather(data) {
 
   tempValue.textContent = Math.round(data.main.temp);
@@ -70,46 +78,66 @@ function displayWeather(data) {
   locationText.textContent = `${data.name}, ${data.sys.country}`;
 
   const iconCode = data.weather[0].icon;
-  weatherIcon.src = `https://openweathermap.org/img/wn/${iconCode}@4x.png`;
+
+  weatherIcon.src =
+    `https://openweathermap.org/img/wn/${iconCode}@4x.png`;
 
   weatherInfo.classList.add("active");
+
 }
 
 
-// Show error
+// SHOW ERROR
 function showError(message) {
+
   errorMessage.textContent = message;
   errorMessage.classList.add("active");
   weatherInfo.classList.remove("active");
+
 }
 
 
+// HIDE ERROR
 function hideError() {
+
   errorMessage.classList.remove("active");
+
 }
 
 
-// Auto-location weather
-navigator.geolocation.getCurrentPosition(async (position) => {
+// AUTO LOCATION WEATHER
+if (navigator.geolocation) {
 
-  const lat = position.coords.latitude;
-  const lon = position.coords.longitude;
+  navigator.geolocation.getCurrentPosition(
+    async (position) => {
 
-  try {
+      const lat = position.coords.latitude;
+      const lon = position.coords.longitude;
 
-    const response = await fetch(
-      `${API_URL}?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric`
-    );
+      try {
 
-    if (!response.ok) {
-      throw new Error("Location weather not available");
+        const response = await fetch(
+          `${API_URL}?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric`
+        );
+
+        const data = await response.json();
+
+        if (response.ok) {
+          displayWeather(data);
+        }
+
+      } catch (error) {
+
+        console.log("Location weather not available");
+
+      }
+
+    },
+    () => {
+
+      console.log("Location permission denied");
+
     }
+  );
 
-    const data = await response.json();
-    displayWeather(data);
-
-  } catch (error) {
-    console.log(error.message);
-  }
-
-});
+}
