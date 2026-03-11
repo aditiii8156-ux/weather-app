@@ -1,4 +1,4 @@
-const API_KEY = "YOUR_API_KEY";
+const API_KEY = "d7fd3a821a40a3bb8866ce5b341a510f";
 const API_URL = "https://api.openweathermap.org/data/2.5/weather";
 
 const cityInput = document.getElementById("city-input");
@@ -102,4 +102,5 @@ navigator.geolocation.getCurrentPosition(async position => {
   }
 
 });
+
 
